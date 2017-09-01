@@ -224,7 +224,8 @@ final public class Skull: SQLDatabase {
     throw SkullError.sqliteMessage(msg)
   }
 
-  private func column(_ pStmt: OpaquePointer, _ i: Int) -> SkullColumn<AnyObject>? {
+  private func column(
+    _ pStmt: OpaquePointer, _ i: Int) -> SkullColumn<AnyObject>? {
     let index = CInt(i)
     let type = sqlite3_column_type(pStmt, index)
     let cname = sqlite3_column_name(pStmt, index)
@@ -348,20 +349,8 @@ final public class Skull: SQLDatabase {
     try run(pStmt, cb: cb)
   }
 
-  private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-  
-  /// The SQL standard specifies that single-quotes in strings should be escaped
-  /// by putting two single quotes in a row.
-  private static func SQLString(from string: String) -> String {
-    let s = string.replacingOccurrences(
-      of: "'",
-      with: "''",
-      options: String.CompareOptions.literal,
-      range: nil
-    )
-    
-    return "'\(s)'"
-  }
+  private let SQLITE_TRANSIENT
+    = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
   /// Updates the database with the provided `sql` statement and `params'.
   ///
@@ -387,8 +376,7 @@ final public class Skull: SQLDatabase {
       case let v as Double:
         try ok(sqlite3_bind_double(pStmt, i, CDouble(v)), ctx!)
       case let v as String:
-        let str = Skull.SQLString(from: v)
-        let len = CInt(str.characters.count)
+        let len = CInt(v.characters.count)
         try ok(sqlite3_bind_text(pStmt, i, v, len, SQLITE_TRANSIENT), ctx!)
       default:
         throw SkullError.unsupportedType

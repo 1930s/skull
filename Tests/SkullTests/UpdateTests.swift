@@ -3,7 +3,7 @@
 //  Skull
 //
 //  Created by Michael Nisi on 22/06/16.
-//  Copyright © 2016 Michael Nisi. All rights reserved.
+//  Copyright © 2016-2017 Michael Nisi. All rights reserved.
 //
 
 import XCTest
@@ -116,30 +116,45 @@ class UpdateTests: XCTestCase {
       }
       return 0
     }
-    XCTAssertEqual(count, 1, "should be one empty row, because we don't validate")
+    XCTAssertEqual(count, 1, "should be a empty row, we don't validate")
   }
 
   func testTransaction() {
     try! db.update("BEGIN IMMEDIATE;")
     try! db.update("CREATE TABLE shows(id INTEGER PRIMARY KEY, title TEXT);")
-    let shows = ["Fargo", "Game Of Thrones", "The Walking Dead"]
+    let shows = ["Fargo", "Game Of Thrones", "The Walking Dead", "Quote's"]
     for show: String in shows {
       try! db.update("INSERT INTO shows(id, title) VALUES (?,?);", nil, show)
     }
     try! db.update("COMMIT;")
+    
     func selectShows() {
-      var count = 0
+      var titles = [String]()
+      
       try! db.query("SELECT * FROM shows;") { er, row in
         XCTAssertNil(er)
         XCTAssertNotNil(row)
-        count += 1
+        
+        let title = row!["title"] as! String
+        titles.append(title)
+        
         return 0
       }
-      XCTAssertEqual(count, 3)
+      
+      XCTAssertEqual(titles.count, shows.count)
+      
+      for (i, found) in titles.enumerated() {
+        let wanted = shows[i]
+        XCTAssertEqual(found, wanted)
+      }
     }
+    
     selectShows()
     XCTAssertEqual(db.cache.count, 6, "should cache statements")
+    
     selectShows()
+    XCTAssertEqual(db.cache.count, 6, "should cache statements")
+    
     try! db.flush()
     XCTAssert(db.cache.isEmpty, "should purge statements")
   }

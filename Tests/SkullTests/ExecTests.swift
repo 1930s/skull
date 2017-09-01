@@ -3,7 +3,7 @@
 //  Skull
 //
 //  Created by Michael Nisi on 22/06/16.
-//  Copyright © 2016 Michael Nisi. All rights reserved.
+//  Copyright © 2016-2017 Michael Nisi. All rights reserved.
 //
 
 import XCTest
@@ -68,15 +68,15 @@ class ExecTests: XCTestCase {
       found = row["sqlite_version()"]
       return 0
     }
+//    print(found)
     XCTAssertNotNil(found)
-    // print("     SQLite Version \(found!)")
   }
 
   func testThrowing() {
     try! db.exec("")
 
     XCTAssertThrowsError(try db.exec("SELECT wtf();"))
-    XCTAssertThrowsError(try db.exec("oh hi, I just wanted to ask"))
+    XCTAssertThrowsError(try db.exec("Oh Hi"))
   }
 
   func testExec() {
