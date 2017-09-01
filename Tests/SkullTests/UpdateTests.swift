@@ -9,8 +9,6 @@
 import XCTest
 @testable import Skull
 
-// TODO: Make UpdateTests less dumb
-
 class UpdateTests: XCTestCase {
 
   var db: Skull!

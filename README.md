@@ -5,7 +5,7 @@
 
 > Everything should be made as simple as possible, but no simpler.<br>—*Albert Einstein*
 
-The **Skull** Swift package offers a bare bones interface for [SQLite](https://www.sqlite.org/). Emphasising simplicity, its synchronous API implements a minimal set of functions for interacting with SQLite: `exec`, `query`, and `update`. If you're in the market for a richer API, go check out [SQLite](https://github.com/stephencelis/SQLite.swift).
+The **Skull** Swift package offers a bare bones (400 LOC) interface for [SQLite](https://www.sqlite.org/). Emphasising simplicity, its synchronous API implements a minimal set of functions for interacting with SQLite. If you're in the market for a richer API, go check out [SQLite](https://github.com/stephencelis/SQLite.swift).
 
 ## Example
 
