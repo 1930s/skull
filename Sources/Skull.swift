@@ -50,10 +50,8 @@ public protocol SQLDatabase {
 
   func flush() throws
 
-  func exec(
-    _ sql: String,
-    cb: @escaping (SkullError?, [String : String]) -> Int
-  ) throws
+  func exec(_ sql: String,
+    cb: @escaping (SkullError?, [String : String]) -> Int) throws
 
   func query(_ sql: String, cb: (SkullError?, SkullRow?) -> Int) throws
   func update(_ sql: String, _ params: Any?...) throws
@@ -69,14 +67,14 @@ struct SkullColumn<T>: CustomStringConvertible {
   }
 }
 
-/// Evaluates SQLite result code and eventually throws
+/// Evaluates SQLite result code and potentially throws
 /// `SkullError.sqliteError(Int, String)` if `code` is anything but `SQLITE_OK`.
 ///
 /// - Parameters:
 ///   - code: The SQLite result code.
 ///   - ctx: The SQLite database connection handle.
 ///
-/// - Throws: Might throw`SkullError.sqliteError(Int, String)` if code is
+/// - Throws: May throw`SkullError.sqliteError(Int, String)` if code is
 /// non-zero.
 private func ok(_ code: CInt, _ ctx: OpaquePointer) throws {
   if code != SQLITE_OK {
@@ -107,13 +105,10 @@ final public class Skull: SQLDatabase {
 
   /// The URL of the database file or `nil` if this is an in-memory database.
   public var url: URL? {
-    if let f = filename {
-      guard f != "" else {
-        return nil
-      }
-      return URL(string: f)
+    guard let f = filename, f != "" else {
+      return nil
     }
-    return nil
+    return URL(string: f)
   }
 
   private func checkIfOpen() throws {
@@ -276,7 +271,7 @@ final public class Skull: SQLDatabase {
     return SkullColumn(name: name, value: value as AnyObject)
   }
 
-  /// Steps through `preparedStatement` applying the callback with resulting
+  /// Steps through `pStmt` applying the callback with resulting
   /// errors and rows with each step.
   ///
   /// - Parameters:
@@ -315,23 +310,22 @@ final public class Skull: SQLDatabase {
     try ok(sqlite3_reset(pStmt), ctx!)
   }
 
-  /// Returns a prepared statement compiled from `sql`. Prepared statements
-  /// get cached.
+  /// Resets all host parameters of a prepared `statement` to `NULL`.
+  public func clearBindings(of statement: OpaquePointer) throws {
+    try ok(sqlite3_clear_bindings(statement), ctx!)
+  }
+
+  /// Returns a prepared statement compiled from `sql`.
   private func prepare(_ sql: String) throws -> OpaquePointer {
-    var pStmt: OpaquePointer? = nil
     if let cached = cache[sql] {
-      try ok(sqlite3_clear_bindings(pStmt), ctx!)
+      try clearBindings(of: cached)
       return cached
     } else {
+      var pStmt: OpaquePointer? = nil
       try ok(sqlite3_prepare_v2(ctx, sql, -1, &pStmt, nil), ctx!)
       cache[sql] = pStmt
       return pStmt!
     }
-  }
-
-  /// Clears bindings of a prepared statement.
-  private func clear(_ pStmt: OpaquePointer) throws {
-    try ok(sqlite3_clear_bindings(pStmt), ctx!)
   }
 
   /// Queries the database with the specified *selective* `sql` statement.
@@ -352,6 +346,26 @@ final public class Skull: SQLDatabase {
   private let SQLITE_TRANSIENT
     = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
+  /// Binds `parameter` at `index` to prepared `statement`.
+  public func bind(
+    statement: OpaquePointer, at index: CInt, to parameter: Any?) throws {
+    switch parameter {
+    case nil:
+      try ok(sqlite3_bind_null(statement, index), ctx!)
+    case let v as Int:
+      try ok(sqlite3_bind_int(statement, index, CInt(v)), ctx!)
+    case let v as Float:
+      try ok(sqlite3_bind_double(statement, index, CDouble(v)), ctx!)
+    case let v as Double:
+      try ok(sqlite3_bind_double(statement, index, CDouble(v)), ctx!)
+    case let v as String:
+      let len = CInt(v.characters.count)
+      try ok(sqlite3_bind_text(statement, index, v, len, SQLITE_TRANSIENT), ctx!)
+    default:
+      throw SkullError.unsupportedType
+    }
+  }
+
   /// Updates the database with the provided `sql` statement and `params'.
   ///
   /// - Parameters:
@@ -362,38 +376,27 @@ final public class Skull: SQLDatabase {
   /// `SkullError.unsupportedType`.
   public func update(_ sql: String, _ params: Any?...) throws {
     let pStmt = try prepare(sql)
-    
+
     for (index, param) in params.enumerated() {
-      let i = CInt(index + 1)
-      
-      switch param {
-      case nil:
-        try ok(sqlite3_bind_null(pStmt, i), ctx!)
-      case let v as Int:
-        try ok(sqlite3_bind_int(pStmt, i, CInt(v)), ctx!)
-      case let v as Float:
-        try ok(sqlite3_bind_double(pStmt, i, CDouble(v)), ctx!)
-      case let v as Double:
-        try ok(sqlite3_bind_double(pStmt, i, CDouble(v)), ctx!)
-      case let v as String:
-        let len = CInt(v.characters.count)
-        try ok(sqlite3_bind_text(pStmt, i, v, len, SQLITE_TRANSIENT), ctx!)
-      default:
-        throw SkullError.unsupportedType
-      }
+      try bind(statement: pStmt, at: CInt(index + 1), to: param)
     }
-    
+
     try run(pStmt)
   }
 
-  /// Flushes the cache to reduce memory, deleting all prepared statements.
+  /// Resets prepared `statement` back to its initial state.
+  public func finalize(statement: OpaquePointer) throws {
+    try ok(sqlite3_finalize(statement), ctx!)
+  }
+
+  /// Flushes the cache, releasing all prepared statements.
   ///
   /// - Throws: Throws `SkullError` if any cached prepared statement indicated
   /// an error in its most recent appliance.
   public func flush() throws {
     let pStmts = cache.values
     let errors: [Error] = pStmts.flatMap {
-      do { try ok(sqlite3_finalize($0), ctx!) } catch { return error }
+      do { try finalize(statement: $0)} catch { return error }
       return nil
     }
     guard errors.isEmpty else {
