@@ -37,6 +37,8 @@ class UpdateTests: XCTestCase {
     try! db.exec(
       "SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1;"
     ) { error, row in
+      XCTAssertNil(error)
+
       let types = [
         ("t", "text"),
         ("nu", "integer"),
