@@ -39,27 +39,27 @@ class ExecTests: XCTestCase {
   }
 
   func load() throws -> String? {
-    return [
-      "CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)",
-      "INSERT INTO t1 VALUES('500.0', '500.0', '500.0', '500.0', '500.0')",
-      "SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1",
+    return """
+      CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB);
+      INSERT INTO t1 VALUES('500.0', '500.0', '500.0', '500.0', '500.0');
+      SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1;
 
-      "DELETE FROM t1",
-      "INSERT INTO t1 VALUES(500.0, 500.0, 500.0, 500.0, 500.0)",
-      "SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1",
+      DELETE FROM t1;
+      INSERT INTO t1 VALUES(500.0, 500.0, 500.0, 500.0, 500.0);
+      SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1;
 
-      "DELETE FROM t1",
-      "INSERT INTO t1 VALUES(500, 500, 500, 500, 500)",
-      "SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1",
+      DELETE FROM t1;
+      INSERT INTO t1 VALUES(500, 500, 500, 500, 500);
+      SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1;
 
-      "DELETE FROM t1",
-      "INSERT INTO t1 VALUES(x'0500', x'0500', x'0500', x'0500', x'0500')",
-      "SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1",
+      DELETE FROM t1;
+      INSERT INTO t1 VALUES(x'0500', x'0500', x'0500', x'0500', x'0500');
+      SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1;
 
-      "DELETE FROM t1",
-      "INSERT INTO t1 VALUES(NULL,NULL,NULL,NULL,NULL)",
-      "SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1",
-    ].joined(separator: ";\n")
+      DELETE FROM t1;
+      INSERT INTO t1 VALUES(NULL,NULL,NULL,NULL,NULL);
+      SELECT typeof(t), typeof(nu), typeof(i), typeof(r), typeof(no) FROM t1;
+    """
   }
 
   func testVersion() {
