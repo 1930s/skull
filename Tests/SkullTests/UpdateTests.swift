@@ -106,10 +106,10 @@ class UpdateTests: XCTestCase {
   }
 
   func testTransaction() {
-    try! db.update("BEGIN IMMEDIATE;")
+    try! db.update("BEGIN;")
     try! db.update("CREATE TABLE shows(id INTEGER PRIMARY KEY, title TEXT);")
     let shows = ["Fargo", "Game Of Thrones", "The Walking Dead", "Quote's"]
-    for show: String in shows {
+    for show in shows {
       try! db.update("INSERT INTO shows(id, title) VALUES (?,?);", nil, show)
     }
     try! db.update("COMMIT;")
@@ -127,7 +127,7 @@ class UpdateTests: XCTestCase {
         return 0
       }
 
-      XCTAssertEqual(titles.count, shows.count)
+      XCTAssertEqual(titles, shows)
 
       for (i, found) in titles.enumerated() {
         let wanted = shows[i]
@@ -135,11 +135,10 @@ class UpdateTests: XCTestCase {
       }
     }
 
-    selectShows()
-    XCTAssertEqual(db.cache.count, 5, "should cache statements")
-
-    selectShows()
-    XCTAssertEqual(db.cache.count, 5, "should cache statements")
+    for _ in 0...3 {
+      selectShows()
+      XCTAssertEqual(db.cache.count, 5, "should cache statements")
+    }
 
     try! db.flush()
     XCTAssert(db.cache.isEmpty, "should purge statements")

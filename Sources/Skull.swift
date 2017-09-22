@@ -320,12 +320,11 @@ final public class Skull: SQLDatabase {
     if let cached = cache[sql] {
       try clearBindings(of: cached)
       return cached
-    } else {
-      var pStmt: OpaquePointer? = nil
-      try ok(sqlite3_prepare_v2(ctx, sql, -1, &pStmt, nil), ctx!)
-      cache[sql] = pStmt
-      return pStmt!
     }
+    var pStmt: OpaquePointer? = nil
+    try ok(sqlite3_prepare_v2(ctx, sql, -1, &pStmt, nil), ctx!)
+    cache[sql] = pStmt
+    return pStmt!
   }
 
   /// Queries the database with the specified *selective* `sql` statement.
