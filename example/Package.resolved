@@ -12,7 +12,7 @@
       },
       {
         "package": "Skull",
-        "repositoryURL": "/Users/michael/skull",
+        "repositoryURL": "https://github.com/michaelnisi/skull",
         "state": {
           "branch": null,
           "revision": "3dbc8d074e60dce93a2b7bd7842271cddddbf0ed",
