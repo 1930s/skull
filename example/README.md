@@ -1,3 +1,3 @@
-# example
+# Skull Example
 
-A description of this package.
+A simple example of using [Skull](https://github.com/michaelnisi/skull).

@@ -42,15 +42,15 @@ skull.sync {
 }
 ```
 
-To run this example, included in this repo, try:
+To build and run this example, in this repo, try:
 
 ```
 cd example
 swift build
-./.build/*your-platform*/debug/example
+./.build/x86_64-apple-macosx10.10/debug/example
 ```
 
-**Skull**'s tiny API leaves access serialization to users. Leveraging a dedicated serial queue, as shown in the example above, intuitively ensures serialized access.
+**Skull** is deliberately thin, its tiny API leaves access serialization to users. Leveraging a dedicated serial queue, as shown in the example above, intuitively ensures serialized access.
 
 ## Types
 
@@ -110,7 +110,7 @@ protocol SQLDatabase {
 To open a database connection you initialize a new `Skull` object.
 
 ```swift
-init(_ url: NSURL? = nil) throws
+init(_ url: URL? = nil) throws
 ```
 
 - `url` The location of the database file to open.
@@ -201,9 +201,9 @@ Of course, you can also test and build using `xcodebuild` directly or from withi
 
 ### Swift Package Manager
 
-Experimentally, you can also build **Skull** with [SPM](https://swift.org/package-manager/) for your current machine.
+Experimentally, you can also build **Skull** with [SPM](https://swift.org/package-manager/) for your current platform.
 
-If you are a [pkgsrc](https://pkgsrc.joyent.com/install-on-osx/) user, you should be good to go, if not, not only are you missing out, but you'd also have to fix the path to the SQLite3 header, defined in the library module dependency `CSqlite3`, found in `Packages`. The `Packages` directory is created by `swift test` or `swift build`.
+If you are a [pkgsrc](https://pkgsrc.joyent.com/install-on-osx/) user, you should be good to go. If not, you have to fix the path to the SQLite3 header, defined in the library module dependency `CSqlite3`, found in `Packages`. The `Packages` directory is created by `swift test` or `swift build`.
 
 ```
 module CSqlite3 [system] {
@@ -213,7 +213,7 @@ module CSqlite3 [system] {
 }
 ```
 
-Once you made sure SPM sees the SQLite system library and all its dependencies, you can test **Skull** with:
+Once you made sure SPM sees the SQLite system library, and all its dependencies, you can test **Skull** with:
 
 ```sh
 swift test

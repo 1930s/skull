@@ -16,8 +16,8 @@ public enum SkullError: Error {
   case invalidURL
   case notOpen
   case sqliteError(Int, String)
-  case unsupportedType
   case sqliteMessage(String)
+  case unsupportedType
 }
 
 extension SkullError: CustomStringConvertible {
@@ -346,7 +346,7 @@ final public class Skull: SQLDatabase {
     = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
   /// Binds `parameter` at `index` to prepared `statement`.
-  public func bind(
+  private func bind(
     statement: OpaquePointer, at index: CInt, to parameter: Any?) throws {
     switch parameter {
     case nil:
@@ -384,7 +384,7 @@ final public class Skull: SQLDatabase {
   }
 
   /// Resets prepared `statement` back to its initial state.
-  public func finalize(statement: OpaquePointer) throws {
+  private func finalize(statement: OpaquePointer) throws {
     try ok(sqlite3_finalize(statement), ctx!)
   }
 
