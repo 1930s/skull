@@ -5,7 +5,7 @@
 
 > Everything should be made as simple as possible, but no simpler.<br>—*Albert Einstein*
 
-The **Skull** Swift package offers a bare bones (400 LOC) interface for [SQLite](https://www.sqlite.org/). Emphasising simplicity, its synchronous API implements a minimal set of functions for interacting with SQLite. If you're in the market for a richer API, go check out [SQLite](https://github.com/stephencelis/SQLite.swift).
+The **Skull** Swift package offers a bare bones (400 LOC) interface for [SQLite](https://www.sqlite.org/). Emphasising simplicity, its synchronous API implements a minimal set of functions for interacting with SQLite.
 
 ## Example
 
@@ -20,6 +20,7 @@ skull.async {
   let sql = "create table planets (id integer primary key, au double, name text);"
   try! db.exec(sql)
 }
+
 skull.async {
   let sql = "insert into planets values (?, ?, ?);"
   try! db.update(sql, 0, 0.4, "Mercury")
@@ -27,15 +28,26 @@ skull.async {
   try! db.update(sql, 2, 1, "Earth")
   try! db.update(sql, 3, 1.5, "Mars")
 }
+
+// Synchronously, just so we don‘t exit before the callbacks are run.
 skull.sync {
   let sql = "select name from planets where au=1;"
   try! db.query(sql) { er, row in
     assert(er == nil)
     let name = row?["name"] as! String
     assert(name == "Earth")
+    print(name)
     return 0
   }
 }
+```
+
+To run this example, included in this repo, try:
+
+```
+cd example
+swift build
+./.build/*your-platform*/debug/example
 ```
 
 **Skull**'s tiny API leaves access serialization to users. Leveraging a dedicated serial queue, as shown in the example above, intuitively ensures serialized access.
