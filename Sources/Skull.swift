@@ -12,7 +12,7 @@ import CSqlite3
 /// `SkullError` enumerates explicit errors.
 public enum SkullError: Error {
   case alreadyOpen(String)
-  case failedToFinalize(Array<Error>)
+  case failedToFinalize([Error])
   case invalidURL
   case notOpen
   case sqliteError(Int, String)
@@ -63,7 +63,7 @@ struct SkullColumn<T>: CustomStringConvertible {
   let value: T
 
   var description: String {
-    return "SkullColumn: \(name), \(value)"
+    return "SkullColumn: { \(name), \(value) }"
   }
 }
 
@@ -407,11 +407,18 @@ final public class Skull: SQLDatabase {
   /// Close the database connection finalizing and flushing prepared statements.
   ///
   /// - Throws: Might throw `SkullError`.
-  public func close() throws {
+  private func close() throws {
     try flush()
     guard ctx != nil else { throw SkullError.notOpen }
     try ok(sqlite3_close(ctx), ctx!)
     ctx = nil
+  }
+
+  deinit {
+    do {
+      try close()
+    } catch {
+    }
   }
 }
 
