@@ -155,7 +155,7 @@ try! db.update(sql, 0, 0.4, "Mercury")
 
 This method may throw `SkullError.sqliteError(Int, String)` or `SkullError.unsupportedType`.
 
-### Managing the Database Connection
+### Housekeeping
 
 ```swift
 func flush() throws
@@ -163,7 +163,9 @@ func flush() throws
 
 Removes and finalizes all cached prepared statements.
 
-*The database connection is closed when the `Skull` object is deinitialized.*
+### Closing the Database
+
+Close the dabase connection, actually it’s just a file handle, by simply dismissing the `Skull` object, the file is closed in `deinit`.
 
 ```swift
 var url: URL? { get }
