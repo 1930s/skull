@@ -424,8 +424,10 @@ final public class Skull: SQLDatabase {
 }
 
 extension Skull: CustomStringConvertible {
+  
   public var description: String {
-    let str = filename ?? "closed"
+    let str = url?.description ?? "in-memory"
     return "Skull: \(str)"
   }
+  
 }
