@@ -404,7 +404,7 @@ final public class Skull: SQLDatabase {
     cache.removeAll()
   }
 
-  /// Close the database connection finalizing and flushing prepared statements.
+  /// Closes the database connection finalizing and flushing prepared statements.
   ///
   /// - Throws: Might throw `SkullError`.
   private func close() throws {
@@ -418,6 +418,7 @@ final public class Skull: SQLDatabase {
     do {
       try close()
     } catch {
+      // This probably just means, we’ve been opened with an invalid URL.
     }
   }
 }
