@@ -1,6 +1,7 @@
 ### 5.1.0 (2017-12-11)
 
-Decided, the simplest interface for opening and closing a database is the `Skull` object itself. Creating the object opens the database, dismissing the object closes the database.
+Open and close the database with the `Skull` object itself. Creating the object opens the database, dismissing the object closes the database.
+([@michaelnisi](https://github.com/michaelnisi))
 
 ### 5.0.0 (2017-09-29)
 
