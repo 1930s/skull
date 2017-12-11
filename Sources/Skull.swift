@@ -25,18 +25,18 @@ extension SkullError: CustomStringConvertible {
     switch self {
     case .alreadyOpen(let filename):
       return "Skull: \(filename) already open"
-    case .sqliteError(let code, let msg):
-      return "Skull: \(code): \(msg)"
-    case .sqliteMessage(let msg):
-      return "Skull: \(msg)"
+    case .failedToFinalize(let errors):
+      return "Skull: failed to finalize: \(errors)"
     case .invalidURL:
       return "Skull: invalid URL"
     case .notOpen:
       return "Skull: not open"
+    case .sqliteError(let code, let msg):
+      return "Skull: \(code): \(msg)"
+    case .sqliteMessage(let msg):
+      return "Skull: \(msg)"
     case .unsupportedType:
       return "Skull: unsupported type"
-    case .failedToFinalize(let errors):
-      return "Skull: failed to finalize: \(errors)"
     }
   }
 }
