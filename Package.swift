@@ -1,4 +1,4 @@
-// swift-tools-version:4.0
+// swift-tools-version:4.2
 
 import PackageDescription
 
@@ -13,5 +13,6 @@ let package = Package(
   targets: [
     .target(name: "Skull", dependencies: [], path: "Sources"),
     .testTarget(name: "SkullTests", dependencies: ["Skull"]),
-  ]
+  ],
+  swiftLanguageVersions: [.v4_2]
 )
