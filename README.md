@@ -1,5 +1,4 @@
 [![Build Status](https://secure.travis-ci.org/michaelnisi/skull.svg)](http://travis-ci.org/michaelnisi/skull)
-[![Code Coverage](https://codecov.io/github/michaelnisi/skull/coverage.svg?branch=master)](https://codecov.io/github/michaelnisi/skull?branch=master)
 
 # Skull - Swift SQLite
 
