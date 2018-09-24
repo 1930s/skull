@@ -10,7 +10,7 @@ let package = Package(
   targets: [
     .systemLibrary(name: "CSqlite3", path: "Libraries/csqlite"),
     .target(name: "Skull", dependencies: ["CSqlite3"], path: "Sources"),
-    .testTarget(name: "SkullTests", dependencies: ["Skull"]),
+    .testTarget(name: "SkullTests", dependencies: ["Skull"])
   ],
   swiftLanguageVersions: [.v4_2]
 )
